@@ -1,0 +1,1124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, viewport-fit=cover">
+    
+    <!-- PWA Meta Tags -->
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="Life Timeline">
+    <meta name="theme-color" content="#faf9f7">
+    <meta name="mobile-web-app-capable" content="yes">
+    
+    <!-- iOS Icons -->
+    <link rel="apple-touch-icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect fill='%23c17f59' width='100' height='100' rx='20'/><text x='50' y='68' font-size='50' text-anchor='middle' fill='white'>◆</text></svg>">
+    
+    <title>Life Timeline</title>
+    
+    <style>
+        :root {
+            --bg: #faf9f7;
+            --bg-card: #ffffff;
+            --timeline-past: #2c2c2c;
+            --timeline-future: #7a9e7e;
+            --accent: #c17f59;
+            --accent-light: #d4a574;
+            --text-primary: #1a1a1a;
+            --text-secondary: #5a5a5a;
+            --text-muted: #8a8a8a;
+            --border: #e0ded9;
+            --safe-top: env(safe-area-inset-top);
+            --safe-bottom: env(safe-area-inset-bottom);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            min-height: 100dvh;
+            line-height: 1.5;
+            padding-top: var(--safe-top);
+            padding-bottom: var(--safe-bottom);
+            overscroll-behavior: none;
+        }
+
+        /* Header */
+        .header {
+            position: sticky;
+            top: 0;
+            background: rgba(250, 249, 247, 0.9);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            padding: 16px 20px;
+            padding-top: calc(16px + var(--safe-top));
+            z-index: 100;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logo {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: -0.02em;
+        }
+
+        .header-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn {
+            font-family: inherit;
+            padding: 10px 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+
+        .btn-primary {
+            background: var(--accent);
+            color: white;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.96);
+        }
+
+        .btn-icon {
+            width: 40px;
+            height: 40px;
+            padding: 0;
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        /* Main container */
+        .main {
+            padding: 20px;
+            padding-bottom: calc(100px + var(--safe-bottom));
+        }
+
+        /* Stats */
+        .stats {
+            display: flex;
+            justify-content: space-around;
+            padding: 24px 16px;
+            background: var(--bg-card);
+            border-radius: 16px;
+            margin-bottom: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            line-height: 1.2;
+        }
+
+        .stat-value.past { color: var(--timeline-past); }
+        .stat-value.total { color: var(--accent); }
+        .stat-value.future { color: var(--timeline-future); }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 4px;
+        }
+
+        /* Filters */
+        .filters {
+            display: flex;
+            justify-content: center;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            background: transparent;
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            font-family: inherit;
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: var(--text-secondary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .filter-btn.active {
+            background: var(--text-primary);
+            border-color: var(--text-primary);
+            color: white;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            padding: 20px 0;
+        }
+
+        /* Section header */
+        .section-header {
+            text-align: center;
+            margin: 30px 0 20px;
+        }
+
+        .section-header span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 0 16px;
+        }
+
+        /* Present marker */
+        .present-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 30px 0;
+            margin: 20px 0;
+        }
+
+        .present-badge {
+            background: var(--bg-card);
+            border: 2px solid var(--accent-light);
+            padding: 12px 28px;
+            border-radius: 30px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 0.1em;
+            text-transform: uppercase;
+            color: var(--accent);
+            box-shadow: 0 4px 20px rgba(193, 127, 89, 0.2);
+        }
+
+        /* Milestone turn */
+        .milestone-turn {
+            display: flex;
+            align-items: flex-start;
+            margin-bottom: 24px;
+            position: relative;
+        }
+
+        .milestone-turn.left {
+            flex-direction: row;
+            padding-right: 50%;
+        }
+
+        .milestone-turn.right {
+            flex-direction: row-reverse;
+            padding-left: 50%;
+        }
+
+        /* Year marker */
+        .year-marker {
+            position: absolute;
+            top: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--text-muted);
+            background: var(--bg);
+            padding: 6px 14px;
+            border-radius: 16px;
+            z-index: 5;
+        }
+
+        .milestone-turn.future .year-marker {
+            color: var(--timeline-future);
+        }
+
+        /* Milestone node */
+        .milestone-node {
+            position: absolute;
+            left: 50%;
+            transform: translateX(-50%);
+            top: 20px;
+            width: 56px;
+            height: 56px;
+            background: var(--bg-card);
+            border: 4px solid var(--timeline-past);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.5rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            overflow: hidden;
+            z-index: 10;
+        }
+
+        .milestone-turn.future .milestone-node {
+            border-color: var(--timeline-future);
+        }
+
+        .milestone-node img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Milestone card */
+        .milestone-card {
+            flex: 1;
+            background: var(--bg-card);
+            border-radius: 16px;
+            padding: 20px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
+            position: relative;
+        }
+
+        .milestone-turn.left .milestone-card {
+            margin-right: 45px;
+        }
+
+        .milestone-turn.right .milestone-card {
+            margin-left: 45px;
+        }
+
+        .milestone-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 12px;
+            line-height: 1.3;
+        }
+
+        .milestone-field {
+            background: var(--bg);
+            border-radius: 10px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+
+        .milestone-field-label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: var(--text-muted);
+            margin-bottom: 4px;
+        }
+
+        .milestone-field-value {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        .connection-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: var(--accent);
+            background: rgba(193, 127, 89, 0.1);
+            padding: 4px 10px;
+            border-radius: 10px;
+            margin-top: 8px;
+        }
+
+        /* Empty state */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .empty-icon {
+            font-size: 4rem;
+            opacity: 0.2;
+            margin-bottom: 16px;
+        }
+
+        .empty-state h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-bottom: 24px;
+        }
+
+        /* Modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0,0,0,0.4);
+            backdrop-filter: blur(4px);
+            -webkit-backdrop-filter: blur(4px);
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-radius: 24px 24px 0 0;
+            padding: 24px;
+            padding-bottom: calc(24px + var(--safe-bottom));
+            max-height: 90vh;
+            overflow-y: auto;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1001;
+        }
+
+        .modal-overlay.active .modal {
+            transform: translateY(0);
+        }
+
+        .modal-handle {
+            width: 36px;
+            height: 4px;
+            background: var(--border);
+            border-radius: 2px;
+            margin: 0 auto 20px;
+        }
+
+        .modal h2 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 24px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+        }
+
+        .form-group input,
+        .form-group textarea {
+            width: 100%;
+            padding: 14px 16px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 12px;
+            font-family: inherit;
+            font-size: 1rem;
+            color: var(--text-primary);
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus,
+        .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .form-group textarea {
+            min-height: 80px;
+            resize: none;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+
+        /* Icon selector */
+        .icon-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .icon-option {
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .icon-option.selected {
+            border-color: var(--accent);
+            background: rgba(193, 127, 89, 0.1);
+        }
+
+        .image-upload-btn {
+            width: 48px;
+            height: 48px;
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: var(--text-muted);
+            cursor: pointer;
+        }
+
+        .image-preview {
+            width: 48px;
+            height: 48px;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        /* Connection chips */
+        .connection-chips {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .connection-chip {
+            padding: 8px 14px;
+            background: var(--bg);
+            border: 1.5px solid var(--border);
+            border-radius: 20px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .connection-chip.selected {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: white;
+        }
+
+        /* Modal actions */
+        .modal-actions {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+            margin-top: 24px;
+        }
+
+        .modal-actions .btn {
+            justify-content: center;
+            padding: 16px;
+            font-size: 1rem;
+        }
+
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text-secondary);
+        }
+
+        .btn-delete {
+            background: #fee;
+            color: #c45c5c;
+        }
+
+        /* Action sheet */
+        .action-sheet {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--bg-card);
+            border-radius: 16px 16px 0 0;
+            padding: 8px;
+            padding-bottom: calc(8px + var(--safe-bottom));
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+            z-index: 1002;
+        }
+
+        .action-sheet.active {
+            transform: translateY(0);
+        }
+
+        .action-sheet-btn {
+            width: 100%;
+            padding: 16px;
+            background: transparent;
+            border: none;
+            font-family: inherit;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            text-align: center;
+            cursor: pointer;
+            border-radius: 12px;
+        }
+
+        .action-sheet-btn:active {
+            background: var(--bg);
+        }
+
+        .action-sheet-btn.danger {
+            color: #c45c5c;
+        }
+
+        .action-sheet-cancel {
+            margin-top: 8px;
+            background: var(--bg);
+            font-weight: 600;
+        }
+
+        /* Responsive for larger screens */
+        @media (min-width: 768px) {
+            .main {
+                max-width: 600px;
+                margin: 0 auto;
+            }
+        }
+
+        /* Dark mode support */
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --bg: #1c1c1e;
+                --bg-card: #2c2c2e;
+                --text-primary: #ffffff;
+                --text-secondary: #a0a0a8;
+                --text-muted: #6a6a72;
+                --border: #3a3a3c;
+                --timeline-past: #ffffff;
+            }
+            
+            .header {
+                background: rgba(28, 28, 30, 0.9);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="logo">Life Timeline</div>
+        <div class="header-actions">
+            <button class="btn btn-icon" onclick="showMenu()" aria-label="Menu">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="1"></circle>
+                    <circle cx="12" cy="5" r="1"></circle>
+                    <circle cx="12" cy="19" r="1"></circle>
+                </svg>
+            </button>
+            <button class="btn btn-primary" onclick="openModal()">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <line x1="12" y1="5" x2="12" y2="19"></line>
+                    <line x1="5" y1="12" x2="19" y2="12"></line>
+                </svg>
+                Add
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-value past" id="pastCount">0</div>
+                <div class="stat-label">Past</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value total" id="totalCount">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-value future" id="futureCount">0</div>
+                <div class="stat-label">Future</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all" onclick="setFilter('all')">All</button>
+            <button class="filter-btn" data-filter="past" onclick="setFilter('past')">Past</button>
+            <button class="filter-btn" data-filter="future" onclick="setFilter('future')">Future</button>
+        </div>
+
+        <div class="timeline" id="timeline"></div>
+    </main>
+
+    <!-- Add/Edit Modal -->
+    <div class="modal-overlay" id="modalOverlay" onclick="closeModalOnOverlay(event)">
+        <div class="modal" onclick="event.stopPropagation()">
+            <div class="modal-handle"></div>
+            <h2 id="modalTitle">Add Milestone</h2>
+            
+            <form id="milestoneForm" onsubmit="saveMilestone(event)">
+                <input type="hidden" id="milestoneId">
+                
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>When</label>
+                        <input type="date" id="milestoneWhen" required>
+                    </div>
+                    <div class="form-group">
+                        <label>Icon</label>
+                        <div class="icon-selector" id="iconSelector"></div>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label>What</label>
+                    <input type="text" id="milestoneWhat" placeholder="What happened?" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Why</label>
+                    <textarea id="milestoneWhy" placeholder="Why is this significant?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>How / Opportunities</label>
+                    <textarea id="milestoneHow" placeholder="How did it happen?"></textarea>
+                </div>
+
+                <div class="form-group">
+                    <label>After</label>
+                    <textarea id="milestoneAfter" placeholder="What changed after?"></textarea>
+                </div>
+
+                <div class="form-group" id="connectionsGroup">
+                    <label>Connect to milestones</label>
+                    <div class="connection-chips" id="connectionChips"></div>
+                </div>
+
+                <div class="modal-actions" id="modalActions">
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Menu Action Sheet -->
+    <div class="modal-overlay" id="menuOverlay" onclick="closeMenu()">
+        <div class="action-sheet" id="menuSheet" onclick="event.stopPropagation()">
+            <button class="action-sheet-btn" onclick="exportData()">📤 Export Data</button>
+            <button class="action-sheet-btn" onclick="document.getElementById('importInput').click()">📥 Import Data</button>
+            <button class="action-sheet-btn action-sheet-cancel" onclick="closeMenu()">Cancel</button>
+        </div>
+    </div>
+    <input type="file" id="importInput" accept=".json" style="display:none" onchange="importData(event)">
+
+    <!-- Delete Confirmation -->
+    <div class="modal-overlay" id="deleteOverlay" onclick="closeDelete()">
+        <div class="action-sheet" id="deleteSheet" onclick="event.stopPropagation()">
+            <button class="action-sheet-btn danger" onclick="confirmDelete()">Delete Milestone</button>
+            <button class="action-sheet-btn action-sheet-cancel" onclick="closeDelete()">Cancel</button>
+        </div>
+    </div>
+
+    <script>
+        // Data
+        let milestones = [];
+        let currentFilter = 'all';
+        let editingId = null;
+        let selectedIcon = '⭐';
+        let selectedConnections = [];
+        let deleteTargetId = null;
+
+        const icons = ['⭐', '🎓', '💼', '💍', '🏠', '✈️', '🏆', '❤️', '🎯', '📚', '🚀', '🎨', '👶', '🎉', '💰', '🏥'];
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadData();
+            renderIconSelector();
+            renderTimeline();
+        });
+
+        // Storage
+        function loadData() {
+            const saved = localStorage.getItem('lifeTimelinePWA');
+            if (saved) milestones = JSON.parse(saved);
+        }
+
+        function saveData() {
+            localStorage.setItem('lifeTimelinePWA', JSON.stringify(milestones));
+        }
+
+        // Helpers
+        function getTimeCategory(dateStr) {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            return new Date(dateStr) < today ? 'past' : 'future';
+        }
+
+        function formatYear(dateStr) {
+            return new Date(dateStr).getFullYear();
+        }
+
+        function generateId() {
+            return Date.now().toString(36) + Math.random().toString(36).substr(2);
+        }
+
+        function escapeHtml(text) {
+            if (!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        // Stats
+        function updateStats() {
+            const past = milestones.filter(m => getTimeCategory(m.when) === 'past').length;
+            const future = milestones.filter(m => getTimeCategory(m.when) === 'future').length;
+            document.getElementById('pastCount').textContent = past;
+            document.getElementById('futureCount').textContent = future;
+            document.getElementById('totalCount').textContent = milestones.length;
+        }
+
+        // Filter
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.filter === filter);
+            });
+            renderTimeline();
+        }
+
+        // Render
+        function renderTimeline() {
+            const container = document.getElementById('timeline');
+            updateStats();
+
+            const sorted = [...milestones].sort((a, b) => new Date(a.when) - new Date(b.when));
+            const filtered = sorted.filter(m => {
+                if (currentFilter === 'all') return true;
+                return getTimeCategory(m.when) === currentFilter;
+            });
+
+            if (filtered.length === 0) {
+                container.innerHTML = `
+                    <div class="empty-state">
+                        <div class="empty-icon">◆</div>
+                        <h3>Your timeline awaits</h3>
+                        <p>Add your first milestone to begin.</p>
+                        <button class="btn btn-primary" onclick="openModal()">Add Milestone</button>
+                    </div>
+                `;
+                return;
+            }
+
+            const pastMs = filtered.filter(m => getTimeCategory(m.when) === 'past');
+            const futureMs = filtered.filter(m => getTimeCategory(m.when) === 'future');
+
+            let html = '';
+            let turnIndex = 0;
+
+            if (pastMs.length > 0 && currentFilter !== 'future') {
+                html += '<div class="section-header"><span>Past</span></div>';
+                pastMs.forEach((m, i) => {
+                    html += createMilestoneTurn(m, turnIndex % 2 === 0 ? 'left' : 'right', 'past');
+                    turnIndex++;
+                });
+            }
+
+            if (currentFilter === 'all') {
+                html += '<div class="present-marker"><div class="present-badge">Present</div></div>';
+            }
+
+            if (futureMs.length > 0 && currentFilter !== 'past') {
+                html += '<div class="section-header"><span>Future</span></div>';
+                futureMs.forEach((m, i) => {
+                    html += createMilestoneTurn(m, turnIndex % 2 === 0 ? 'left' : 'right', 'future');
+                    turnIndex++;
+                });
+            }
+
+            container.innerHTML = html;
+        }
+
+        function createMilestoneTurn(m, side, category) {
+            const conns = m.connections || [];
+            let fieldsHtml = '';
+            
+            if (m.why) fieldsHtml += `<div class="milestone-field"><div class="milestone-field-label">Why</div><div class="milestone-field-value">${escapeHtml(m.why)}</div></div>`;
+            if (m.how) fieldsHtml += `<div class="milestone-field"><div class="milestone-field-label">How</div><div class="milestone-field-value">${escapeHtml(m.how)}</div></div>`;
+            if (m.after) fieldsHtml += `<div class="milestone-field"><div class="milestone-field-label">After</div><div class="milestone-field-value">${escapeHtml(m.after)}</div></div>`;
+
+            return `
+                <div class="milestone-turn ${side} ${category}" onclick="editMilestone('${m.id}')">
+                    <div class="year-marker">${formatYear(m.when)}</div>
+                    <div class="milestone-node">${m.icon || '⭐'}</div>
+                    <div class="milestone-card">
+                        <div class="milestone-title">${escapeHtml(m.what)}</div>
+                        ${fieldsHtml}
+                        ${conns.length > 0 ? `<div class="connection-badge">🔗 ${conns.length} linked</div>` : ''}
+                    </div>
+                </div>
+            `;
+        }
+
+        // Icon Selector
+        function renderIconSelector() {
+            const container = document.getElementById('iconSelector');
+            container.innerHTML = icons.map(icon => `
+                <div class="icon-option ${icon === selectedIcon ? 'selected' : ''}" onclick="selectIcon('${icon}')">${icon}</div>
+            `).join('');
+        }
+
+        function selectIcon(icon) {
+            selectedIcon = icon;
+            document.querySelectorAll('.icon-option').forEach(el => {
+                el.classList.toggle('selected', el.textContent === icon);
+            });
+        }
+
+        // Connection Selector
+        function renderConnectionSelector(excludeId) {
+            const container = document.getElementById('connectionChips');
+            const others = milestones.filter(m => m.id !== excludeId);
+            
+            if (others.length === 0) {
+                document.getElementById('connectionsGroup').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('connectionsGroup').style.display = 'block';
+            container.innerHTML = others.map(m => `
+                <div class="connection-chip ${selectedConnections.includes(m.id) ? 'selected' : ''}" 
+                     onclick="toggleConnection('${m.id}')">
+                    ${m.icon || '⭐'} ${escapeHtml(m.what.substring(0, 15))}${m.what.length > 15 ? '...' : ''}
+                </div>
+            `).join('');
+        }
+
+        function toggleConnection(id) {
+            const idx = selectedConnections.indexOf(id);
+            if (idx === -1) selectedConnections.push(id);
+            else selectedConnections.splice(idx, 1);
+            
+            document.querySelectorAll('.connection-chip').forEach(chip => {
+                const chipId = chip.getAttribute('onclick').match(/'([^']+)'/)[1];
+                chip.classList.toggle('selected', selectedConnections.includes(chipId));
+            });
+        }
+
+        // Modal
+        function openModal(id = null) {
+            editingId = id;
+            selectedConnections = [];
+            selectedIcon = '⭐';
+            
+            const overlay = document.getElementById('modalOverlay');
+            const title = document.getElementById('modalTitle');
+            const form = document.getElementById('milestoneForm');
+            const actions = document.getElementById('modalActions');
+
+            if (id) {
+                const m = milestones.find(x => x.id === id);
+                if (m) {
+                    title.textContent = 'Edit Milestone';
+                    document.getElementById('milestoneId').value = m.id;
+                    document.getElementById('milestoneWhat').value = m.what;
+                    document.getElementById('milestoneWhen').value = m.when;
+                    document.getElementById('milestoneWhy').value = m.why || '';
+                    document.getElementById('milestoneHow').value = m.how || '';
+                    document.getElementById('milestoneAfter').value = m.after || '';
+                    selectedIcon = m.icon || '⭐';
+                    selectedConnections = m.connections || [];
+                    
+                    actions.innerHTML = `
+                        <button type="button" class="btn btn-delete" onclick="showDelete('${m.id}')">Delete</button>
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    `;
+                }
+            } else {
+                title.textContent = 'Add Milestone';
+                form.reset();
+                document.getElementById('milestoneId').value = '';
+                actions.innerHTML = `
+                    <button type="button" class="btn btn-secondary" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Save</button>
+                `;
+            }
+
+            renderIconSelector();
+            renderConnectionSelector(id);
+            overlay.classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modalOverlay').classList.remove('active');
+            editingId = null;
+        }
+
+        function closeModalOnOverlay(e) {
+            if (e.target === e.currentTarget) closeModal();
+        }
+
+        function editMilestone(id) {
+            openModal(id);
+        }
+
+        // Save
+        function saveMilestone(e) {
+            e.preventDefault();
+
+            const id = document.getElementById('milestoneId').value;
+            const milestone = {
+                id: id || generateId(),
+                what: document.getElementById('milestoneWhat').value.trim(),
+                when: document.getElementById('milestoneWhen').value,
+                why: document.getElementById('milestoneWhy').value.trim(),
+                how: document.getElementById('milestoneHow').value.trim(),
+                after: document.getElementById('milestoneAfter').value.trim(),
+                icon: selectedIcon,
+                connections: selectedConnections
+            };
+
+            if (id) {
+                const idx = milestones.findIndex(m => m.id === id);
+                if (idx !== -1) milestones[idx] = milestone;
+            } else {
+                milestones.push(milestone);
+            }
+
+            // Update reverse connections
+            milestones.forEach(m => {
+                if (m.id !== milestone.id) {
+                    if (!m.connections) m.connections = [];
+                    if (selectedConnections.includes(m.id)) {
+                        if (!m.connections.includes(milestone.id)) m.connections.push(milestone.id);
+                    } else {
+                        m.connections = m.connections.filter(c => c !== milestone.id);
+                    }
+                }
+            });
+
+            saveData();
+            renderTimeline();
+            closeModal();
+        }
+
+        // Delete
+        function showDelete(id) {
+            deleteTargetId = id;
+            document.getElementById('deleteOverlay').classList.add('active');
+            document.getElementById('deleteSheet').classList.add('active');
+        }
+
+        function closeDelete() {
+            document.getElementById('deleteOverlay').classList.remove('active');
+            document.getElementById('deleteSheet').classList.remove('active');
+            deleteTargetId = null;
+        }
+
+        function confirmDelete() {
+            if (deleteTargetId) {
+                milestones.forEach(m => {
+                    if (m.connections) m.connections = m.connections.filter(c => c !== deleteTargetId);
+                });
+                milestones = milestones.filter(m => m.id !== deleteTargetId);
+                saveData();
+                renderTimeline();
+            }
+            closeDelete();
+            closeModal();
+        }
+
+        // Menu
+        function showMenu() {
+            document.getElementById('menuOverlay').classList.add('active');
+            document.getElementById('menuSheet').classList.add('active');
+        }
+
+        function closeMenu() {
+            document.getElementById('menuOverlay').classList.remove('active');
+            document.getElementById('menuSheet').classList.remove('active');
+        }
+
+        // Export/Import
+        function exportData() {
+            closeMenu();
+            const dataStr = JSON.stringify(milestones, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `life-timeline-${new Date().toISOString().split('T')[0]}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        function importData(event) {
+            closeMenu();
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const imported = JSON.parse(e.target.result);
+                    if (Array.isArray(imported)) {
+                        imported.forEach(m => { if (!m.id) m.id = generateId(); });
+                        milestones = [...milestones, ...imported];
+                        saveData();
+                        renderTimeline();
+                        alert(`Imported ${imported.length} milestones`);
+                    }
+                } catch (err) {
+                    alert('Invalid file format');
+                }
+            };
+            reader.readAsText(file);
+            event.target.value = '';
+        }
+    </script>
+</body>
+</html>
