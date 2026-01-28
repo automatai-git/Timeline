@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mobility Tracker - Life Journey</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#2d2a24">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="mobility.css">
+</head>
+<body>
+    <header class="header">
+        <a href="index.html" class="back-link">← Back</a>
+        <h1 class="page-title">Mobility Tracker</h1>
+        <button id="exportBtn" class="export-btn" title="Export History">📊</button>
+    </header>
+
+    <main class="main-content">
+        <!-- Day Selection -->
+        <section class="day-selector">
+            <h2 class="section-title">Select Day</h2>
+            <div class="day-grid" id="dayGrid">
+                <button class="day-btn" data-day="monday">Mon</button>
+                <button class="day-btn" data-day="tuesday">Tue</button>
+                <button class="day-btn" data-day="wednesday">Wed</button>
+                <button class="day-btn" data-day="thursday">Thu</button>
+                <button class="day-btn" data-day="friday">Fri</button>
+                <button class="day-btn" data-day="saturday">Sat</button>
+                <button class="day-btn" data-day="sunday">Sun</button>
+            </div>
+        </section>
+
+        <!-- Routine Selection -->
+        <section class="routine-selector" id="routineSelector" style="display: none;">
+            <h2 class="section-title">Select Routine</h2>
+            <div class="routine-grid" id="routineGrid"></div>
+        </section>
+
+        <!-- Exercise List -->
+        <section class="exercise-section" id="exerciseSection" style="display: none;">
+            <div class="exercise-header">
+                <h2 class="section-title" id="routineTitle">Exercises</h2>
+                <div class="progress-indicator">
+                    <span id="progressText">0/0</span>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="progressFill"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="exercise-list" id="exerciseList"></div>
+            <div class="action-buttons">
+                <button id="completeWorkoutBtn" class="complete-btn" disabled>Complete Workout</button>
+                <button id="resetBtn" class="reset-btn">Reset</button>
+            </div>
+        </section>
+
+        <!-- History Section -->
+        <section class="history-section">
+            <h2 class="section-title">Recent Sessions</h2>
+            <div class="history-list" id="historyList">
+                <p class="empty-history">No sessions logged yet</p>
+            </div>
+        </section>
+    </main>
+
+    <!-- Export Modal -->
+    <div class="modal-overlay" id="exportModal" style="display: none;">
+        <div class="modal">
+            <h3 class="modal-title">Export Workout History</h3>
+            <div class="export-options">
+                <div class="export-range">
+                    <label>
+                        <span>From:</span>
+                        <input type="date" id="exportFrom">
+                    </label>
+                    <label>
+                        <span>To:</span>
+                        <input type="date" id="exportTo">
+                    </label>
+                </div>
+                <div class="export-format">
+                    <label>
+                        <input type="radio" name="format" value="csv" checked>
+                        CSV (Excel compatible)
+                    </label>
+                    <label>
+                        <input type="radio" name="format" value="json">
+                        JSON
+                    </label>
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button id="cancelExport" class="modal-btn secondary">Cancel</button>
+                <button id="confirmExport" class="modal-btn primary">Export</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="mobility-data.js"></script>
+    <script src="mobility.js"></script>
+</body>
+</html>
