@@ -1,0 +1,1372 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workout Finder</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Nunito Sans', sans-serif;
+            background: linear-gradient(135deg, #f5f3f0 0%, #e8e4df 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 2.5rem;
+            font-weight: 500;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #7d8a96;
+            font-size: 0.95rem;
+        }
+
+        .card {
+            background: white;
+            border-radius: 16px;
+            padding: 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            margin-bottom: 20px;
+        }
+
+        .selection-section {
+            margin-bottom: 30px;
+        }
+
+        .section-title {
+            font-family: 'Cormorant Garamond', serif;
+            font-size: 1.4rem;
+            color: #2c3e50;
+            margin-bottom: 15px;
+        }
+
+        .week-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+            gap: 12px;
+            margin-top: 15px;
+        }
+
+        .week-btn {
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-align: center;
+            font-family: 'Nunito Sans', sans-serif;
+        }
+
+        .week-btn:hover {
+            border-color: #8b9d83;
+            background: #f0f4ed;
+        }
+
+        .week-btn.selected {
+            background: #8b9d83;
+            color: white;
+            border-color: #8b9d83;
+        }
+
+        .week-number {
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 5px;
+        }
+
+        .week-dates {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .week-btn.selected .week-dates {
+            color: rgba(255,255,255,0.8);
+        }
+
+        .day-list {
+            margin-top: 20px;
+        }
+
+        .day-item {
+            background: #f8f9fa;
+            border-left: 4px solid #8b9d83;
+            padding: 20px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .day-item:hover {
+            background: #f0f4ed;
+            transform: translateX(5px);
+        }
+
+        .day-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+
+        .day-name {
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 1.1rem;
+        }
+
+        .day-date {
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+
+        .day-session {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #8b9d83;
+            color: white;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            margin-right: 8px;
+        }
+
+        .day-workout {
+            color: #495057;
+            margin-top: 8px;
+            font-size: 0.95rem;
+        }
+
+        .workout-details {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            margin-top: 20px;
+            border: 2px solid #8b9d83;
+        }
+
+        .detail-row {
+            display: flex;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .detail-row:last-child {
+            border-bottom: none;
+            padding-bottom: 0;
+            margin-bottom: 0;
+        }
+
+        .detail-label {
+            font-weight: 600;
+            color: #6c757d;
+            width: 140px;
+            flex-shrink: 0;
+            font-size: 0.9rem;
+        }
+
+        .detail-value {
+            color: #2c3e50;
+            flex: 1;
+        }
+
+        .rpe-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            background: #8b9d83;
+            color: white;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .phase-badge {
+            display: inline-block;
+            padding: 6px 14px;
+            background: #f8f9fa;
+            color: #495057;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            border: 1px solid #dee2e6;
+        }
+
+        .back-btn {
+            background: #e9ecef;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-family: 'Nunito Sans', sans-serif;
+            font-size: 0.95rem;
+            color: #495057;
+            transition: all 0.3s ease;
+            margin-bottom: 15px;
+        }
+
+        .back-btn:hover {
+            background: #dee2e6;
+        }
+
+        .home-btn {
+            display: inline-block;
+            background: #8b9d83;
+            color: white;
+            padding: 12px 24px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            margin-top: 20px;
+        }
+
+        .home-btn:hover {
+            background: #7a8a73;
+            transform: translateY(-2px);
+        }
+
+        .hidden {
+            display: none;
+        }
+
+        @media (max-width: 600px) {
+            .week-grid {
+                grid-template-columns: repeat(auto-fill, minmax(80px, 1fr));
+            }
+
+            .week-btn {
+                padding: 12px 8px;
+            }
+
+            .detail-row {
+                flex-direction: column;
+            }
+
+            .detail-label {
+                width: 100%;
+                margin-bottom: 5px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Workout Finder</h1>
+            <div class="subtitle">Block 3 Training Plan</div>
+        </header>
+
+        <div id="weekSelection" class="card">
+            <div class="section-title">Select Week</div>
+            <div class="week-grid" id="weekGrid"></div>
+        </div>
+
+        <div id="daySelection" class="card hidden">
+            <button class="back-btn" onclick="backToWeeks()">← Back to Weeks</button>
+            <div class="section-title" id="weekTitle"></div>
+            <div class="day-list" id="dayList"></div>
+        </div>
+
+        <div id="workoutDetails" class="card hidden">
+            <button class="back-btn" onclick="backToDays()">← Back to Week</button>
+            <div id="detailsContent"></div>
+        </div>
+
+        <div style="text-align: center;">
+            <a href="index.html" class="home-btn">← Back to Main Menu</a>
+        </div>
+    </div>
+
+    <script>
+        // Block 3 Training Data
+        const trainingData = {
+            weeks: [
+                {
+                    week: 1,
+                    startDate: '26.01.2026',
+                    endDate: '01.02.2026',
+                    phase: 'Speed Development',
+                    days: [
+                        {
+                            date: '26.01.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Block start - focus on movement quality',
+                            comments: 'Progress bench weight'
+                        },
+                        {
+                            date: '27.01.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Race-pace effort',
+                            comments: ''
+                        },
+                        {
+                            date: '28.01.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Non-negotiable',
+                            comments: ''
+                        },
+                        {
+                            date: '29.01.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Slow eccentrics on rows',
+                            comments: ''
+                        },
+                        {
+                            date: '30.01.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Conversational pace',
+                            comments: ''
+                        },
+                        {
+                            date: '31.01.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Maintenance volume',
+                            comments: ''
+                        },
+                        {
+                            date: '01.02.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Light, controlled',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 2,
+                    startDate: '02.02.2026',
+                    endDate: '08.02.2026',
+                    phase: 'Speed Development',
+                    days: [
+                        {
+                            date: '02.02.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: '',
+                            comments: 'Progress bench weight'
+                        },
+                        {
+                            date: '03.02.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Race-pace effort',
+                            comments: ''
+                        },
+                        {
+                            date: '04.02.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Non-negotiable',
+                            comments: ''
+                        },
+                        {
+                            date: '05.02.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Slow eccentrics on rows',
+                            comments: ''
+                        },
+                        {
+                            date: '06.02.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Conversational pace',
+                            comments: ''
+                        },
+                        {
+                            date: '07.02.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Maintenance volume',
+                            comments: ''
+                        },
+                        {
+                            date: '08.02.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Light, controlled',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 3,
+                    startDate: '09.02.2026',
+                    endDate: '15.02.2026',
+                    phase: 'Speed Development',
+                    days: [
+                        {
+                            date: '09.02.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Assess Copenhagen progression',
+                            comments: 'Progress bench weight'
+                        },
+                        {
+                            date: '10.02.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Race-pace effort',
+                            comments: ''
+                        },
+                        {
+                            date: '11.02.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Non-negotiable',
+                            comments: ''
+                        },
+                        {
+                            date: '12.02.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Slow eccentrics on rows',
+                            comments: ''
+                        },
+                        {
+                            date: '13.02.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Conversational pace',
+                            comments: ''
+                        },
+                        {
+                            date: '14.02.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Maintenance volume',
+                            comments: ''
+                        },
+                        {
+                            date: '15.02.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Light, controlled',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 4,
+                    startDate: '16.02.2026',
+                    endDate: '22.02.2026',
+                    phase: 'Speed Development',
+                    days: [
+                        {
+                            date: '16.02.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Review ankle dorsiflexion progress',
+                            comments: 'Deload week - reduce volume 40%'
+                        },
+                        {
+                            date: '17.02.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Reduced volume',
+                            comments: ''
+                        },
+                        {
+                            date: '18.02.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Focus on recovery',
+                            comments: ''
+                        },
+                        {
+                            date: '19.02.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Light session',
+                            comments: ''
+                        },
+                        {
+                            date: '20.02.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Recovery focus',
+                            comments: ''
+                        },
+                        {
+                            date: '21.02.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Deload',
+                            comments: ''
+                        },
+                        {
+                            date: '22.02.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Active recovery',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 5,
+                    startDate: '23.02.2026',
+                    endDate: '01.03.2026',
+                    phase: 'Peak Speed',
+                    days: [
+                        {
+                            date: '23.02.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '7-8',
+                            notes: 'Increase intensity phase begins',
+                            comments: 'Bench priority'
+                        },
+                        {
+                            date: '24.02.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '7-9',
+                            notes: 'VO2 or threshold',
+                            comments: ''
+                        },
+                        {
+                            date: '25.02.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Essential',
+                            comments: ''
+                        },
+                        {
+                            date: '26.02.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '7-8',
+                            notes: 'Progress load',
+                            comments: ''
+                        },
+                        {
+                            date: '27.02.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '7-9',
+                            notes: 'Steady effort',
+                            comments: ''
+                        },
+                        {
+                            date: '28.02.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '7-8',
+                            notes: 'Lower volume',
+                            comments: ''
+                        },
+                        {
+                            date: '01.03.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '7-8',
+                            notes: 'Keep it brief',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 6,
+                    startDate: '02.03.2026',
+                    endDate: '08.03.2026',
+                    phase: 'Peak Speed',
+                    days: [
+                        {
+                            date: '02.03.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '7-8',
+                            notes: '',
+                            comments: 'Bench priority'
+                        },
+                        {
+                            date: '03.03.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '7-9',
+                            notes: 'VO2 or threshold',
+                            comments: ''
+                        },
+                        {
+                            date: '04.03.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Essential',
+                            comments: ''
+                        },
+                        {
+                            date: '05.03.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '7-8',
+                            notes: 'Progress load',
+                            comments: ''
+                        },
+                        {
+                            date: '06.03.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '7-9',
+                            notes: 'Steady effort',
+                            comments: ''
+                        },
+                        {
+                            date: '07.03.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '7-8',
+                            notes: 'Lower volume',
+                            comments: ''
+                        },
+                        {
+                            date: '08.03.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '7-8',
+                            notes: 'Keep it brief',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 7,
+                    startDate: '09.03.2026',
+                    endDate: '15.03.2026',
+                    phase: 'Peak Speed',
+                    days: [
+                        {
+                            date: '09.03.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '7-8',
+                            notes: '5K TEST WEEK - reduce Wed volume',
+                            comments: 'Save legs for test'
+                        },
+                        {
+                            date: '10.03.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (5K TEST)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '8-9',
+                            notes: 'Prepare nervous system',
+                            comments: ''
+                        },
+                        {
+                            date: '11.03.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Pre-race prep',
+                            comments: ''
+                        },
+                        {
+                            date: '12.03.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '7-8',
+                            notes: 'Don\'t fatigue',
+                            comments: ''
+                        },
+                        {
+                            date: '13.03.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '8-9',
+                            notes: 'Legs fresh for Sunday',
+                            comments: ''
+                        },
+                        {
+                            date: '14.03.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '7-8',
+                            notes: 'Preserve legs',
+                            comments: ''
+                        },
+                        {
+                            date: '15.03.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '7-8',
+                            notes: 'All-out effort',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 8,
+                    startDate: '16.03.2026',
+                    endDate: '22.03.2026',
+                    phase: 'Peak Speed',
+                    days: [
+                        {
+                            date: '16.03.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Recovery week - reduce all RPE by 1',
+                            comments: 'Deload before HM build'
+                        },
+                        {
+                            date: '17.03.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Light turnover',
+                            comments: ''
+                        },
+                        {
+                            date: '18.03.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '3-4',
+                            notes: 'Recovery',
+                            comments: ''
+                        },
+                        {
+                            date: '19.03.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Easy',
+                            comments: ''
+                        },
+                        {
+                            date: '20.03.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Easy',
+                            comments: ''
+                        },
+                        {
+                            date: '21.03.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Recovery',
+                            comments: ''
+                        },
+                        {
+                            date: '22.03.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Active rest',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 9,
+                    startDate: '23.03.2026',
+                    endDate: '29.03.2026',
+                    phase: 'HM Transition',
+                    days: [
+                        {
+                            date: '23.03.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'HM build phase begins',
+                            comments: 'Strength maintenance'
+                        },
+                        {
+                            date: '24.03.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Build threshold',
+                            comments: ''
+                        },
+                        {
+                            date: '25.03.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Critical',
+                            comments: ''
+                        },
+                        {
+                            date: '26.03.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Maintain',
+                            comments: ''
+                        },
+                        {
+                            date: '27.03.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Build distance',
+                            comments: ''
+                        },
+                        {
+                            date: '28.03.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Don\'t fatigue legs',
+                            comments: ''
+                        },
+                        {
+                            date: '29.03.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Keep short',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 10,
+                    startDate: '30.03.2026',
+                    endDate: '05.04.2026',
+                    phase: 'HM Transition',
+                    days: [
+                        {
+                            date: '30.03.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Long run priority',
+                            comments: 'Strength maintenance'
+                        },
+                        {
+                            date: '31.03.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Build threshold',
+                            comments: ''
+                        },
+                        {
+                            date: '01.04.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Critical',
+                            comments: ''
+                        },
+                        {
+                            date: '02.04.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Maintain',
+                            comments: ''
+                        },
+                        {
+                            date: '03.04.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Build distance',
+                            comments: ''
+                        },
+                        {
+                            date: '04.04.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Don\'t fatigue legs',
+                            comments: ''
+                        },
+                        {
+                            date: '05.04.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Keep short',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 11,
+                    startDate: '06.04.2026',
+                    endDate: '12.04.2026',
+                    phase: 'HM Transition',
+                    days: [
+                        {
+                            date: '06.04.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Peak long run week',
+                            comments: 'Volume reduction'
+                        },
+                        {
+                            date: '07.04.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '6-8',
+                            notes: 'Maintain sharpness',
+                            comments: ''
+                        },
+                        {
+                            date: '08.04.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '4-5',
+                            notes: 'Pre-race prep',
+                            comments: ''
+                        },
+                        {
+                            date: '09.04.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Maintain only',
+                            comments: ''
+                        },
+                        {
+                            date: '10.04.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '6-8',
+                            notes: 'Last long run before taper',
+                            comments: ''
+                        },
+                        {
+                            date: '11.04.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '6-7',
+                            notes: 'Minimal',
+                            comments: ''
+                        },
+                        {
+                            date: '12.04.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '6-7',
+                            notes: 'Skip if fatigued',
+                            comments: ''
+                        }
+                    ]
+                },
+                {
+                    week: 12,
+                    startDate: '13.04.2026',
+                    endDate: '19.04.2026',
+                    phase: 'HM Transition',
+                    days: [
+                        {
+                            date: '13.04.2026',
+                            day: 'Monday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Full Body/Upper)',
+                            support: 'Monday Pre + Post',
+                            rpe: '5-6',
+                            notes: 'Taper - reduce support volume 50%',
+                            comments: 'Pre-race week'
+                        },
+                        {
+                            date: '14.04.2026',
+                            day: 'Tuesday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Tempo/Intervals)',
+                            support: 'Tuesday Pre + Post',
+                            rpe: '5-7',
+                            notes: 'Keep legs fresh',
+                            comments: ''
+                        },
+                        {
+                            date: '15.04.2026',
+                            day: 'Wednesday',
+                            session: 'Mobility',
+                            mainWorkout: 'Full corrective session',
+                            support: 'Wednesday FULL (45-60min)',
+                            rpe: '3-4',
+                            notes: 'Recovery',
+                            comments: ''
+                        },
+                        {
+                            date: '16.04.2026',
+                            day: 'Thursday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Upper/Push)',
+                            support: 'Thursday Pre + Post',
+                            rpe: '5-6',
+                            notes: 'Skip if tired',
+                            comments: ''
+                        },
+                        {
+                            date: '17.04.2026',
+                            day: 'Friday',
+                            session: 'Run',
+                            mainWorkout: 'Runna program (Long Run)',
+                            support: 'Friday Pre + Post (Extended)',
+                            rpe: '5-7',
+                            notes: 'Pre-race',
+                            comments: ''
+                        },
+                        {
+                            date: '18.04.2026',
+                            day: 'Saturday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Lower)',
+                            support: 'Saturday Pre + Post',
+                            rpe: '5-6',
+                            notes: 'Race week',
+                            comments: ''
+                        },
+                        {
+                            date: '19.04.2026',
+                            day: 'Sunday',
+                            session: 'Strength',
+                            mainWorkout: 'External program (Arms/Support)',
+                            support: 'Sunday Light',
+                            rpe: '5-6',
+                            notes: 'Peak event',
+                            comments: ''
+                        }
+                    ]
+                }
+            ]
+        };
+
+        let selectedWeek = null;
+
+        // Initialize
+        function init() {
+            renderWeeks();
+        }
+
+        // Render week selection
+        function renderWeeks() {
+            const weekGrid = document.getElementById('weekGrid');
+            weekGrid.innerHTML = '';
+
+            trainingData.weeks.forEach(week => {
+                const weekBtn = document.createElement('div');
+                weekBtn.className = 'week-btn';
+                weekBtn.innerHTML = `
+                    <div class="week-number">Week ${week.week}</div>
+                    <div class="week-dates">${week.startDate.slice(0, 5)}</div>
+                `;
+                weekBtn.onclick = () => selectWeek(week);
+                weekGrid.appendChild(weekBtn);
+            });
+        }
+
+        // Select week and show days
+        function selectWeek(week) {
+            selectedWeek = week;
+            
+            // Update UI
+            document.getElementById('weekSelection').classList.add('hidden');
+            document.getElementById('daySelection').classList.remove('hidden');
+            
+            // Update title
+            document.getElementById('weekTitle').textContent = 
+                `Week ${week.week} (${week.startDate} - ${week.endDate}) - ${week.phase}`;
+            
+            // Render days
+            renderDays(week.days);
+        }
+
+        // Render days for selected week
+        function renderDays(days) {
+            const dayList = document.getElementById('dayList');
+            dayList.innerHTML = '';
+
+            days.forEach(day => {
+                const dayItem = document.createElement('div');
+                dayItem.className = 'day-item';
+                dayItem.innerHTML = `
+                    <div class="day-header">
+                        <div class="day-name">${day.day}</div>
+                        <div class="day-date">${day.date}</div>
+                    </div>
+                    <div>
+                        <span class="day-session">${day.session}</span>
+                        <span class="rpe-badge">RPE ${day.rpe}</span>
+                    </div>
+                    <div class="day-workout">${day.mainWorkout}</div>
+                `;
+                dayItem.onclick = () => showWorkoutDetails(day);
+                dayList.appendChild(dayItem);
+            });
+        }
+
+        // Show workout details
+        function showWorkoutDetails(day) {
+            document.getElementById('daySelection').classList.add('hidden');
+            document.getElementById('workoutDetails').classList.remove('hidden');
+
+            const detailsContent = document.getElementById('detailsContent');
+            detailsContent.innerHTML = `
+                <div class="section-title">${day.day}, ${day.date}</div>
+                <div class="workout-details">
+                    <div class="detail-row">
+                        <div class="detail-label">Session Type</div>
+                        <div class="detail-value"><strong>${day.session}</strong></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Main Workout</div>
+                        <div class="detail-value">${day.mainWorkout}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Support Protocol</div>
+                        <div class="detail-value">${day.support}</div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Target RPE</div>
+                        <div class="detail-value"><span class="rpe-badge">${day.rpe}</span></div>
+                    </div>
+                    <div class="detail-row">
+                        <div class="detail-label">Phase</div>
+                        <div class="detail-value"><span class="phase-badge">${selectedWeek.phase}</span></div>
+                    </div>
+                    ${day.notes ? `
+                    <div class="detail-row">
+                        <div class="detail-label">Notes</div>
+                        <div class="detail-value">${day.notes}</div>
+                    </div>
+                    ` : ''}
+                    ${day.comments ? `
+                    <div class="detail-row">
+                        <div class="detail-label">Comments</div>
+                        <div class="detail-value">${day.comments}</div>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+
+        // Back to weeks
+        function backToWeeks() {
+            document.getElementById('daySelection').classList.add('hidden');
+            document.getElementById('weekSelection').classList.remove('hidden');
+            selectedWeek = null;
+        }
+
+        // Back to days
+        function backToDays() {
+            document.getElementById('workoutDetails').classList.add('hidden');
+            document.getElementById('daySelection').classList.remove('hidden');
+        }
+
+        // Initialize on load
+        init();
+    </script>
+</body>
+</html>

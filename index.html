@@ -3,27 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Life Journey - Timeline & Mobility</title>
+    <meta name="description" content="Personal productivity and wellness tracking applications">
+    <meta name="theme-color" content="#8b9d83">
+    <title>Life & Training Hub</title>
     <link rel="manifest" href="manifest.json">
-    <meta name="theme-color" content="#2d2a24">
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <link rel="apple-touch-icon" href="icon-192.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600&family=Nunito+Sans:wght@300;400;600&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --bg-dark: #2d2a24;
-            --bg-warm: #3d3a34;
-            --text-light: #f5f0e8;
-            --text-muted: #a8a299;
-            --accent-gold: #c9a959;
-            --accent-copper: #b87333;
-            --accent-sage: #8fa68a;
-            --card-bg: rgba(61, 58, 52, 0.8);
-        }
-
         * {
             margin: 0;
             padding: 0;
@@ -32,155 +19,294 @@
 
         body {
             font-family: 'Nunito Sans', sans-serif;
-            background: var(--bg-dark);
-            color: var(--text-light);
+            background: linear-gradient(135deg, #f5f3f0 0%, #e8e4df 100%);
             min-height: 100vh;
             display: flex;
-            flex-direction: column;
             align-items: center;
             justify-content: center;
-            padding: 2rem;
-            background-image: 
-                radial-gradient(ellipse at 20% 30%, rgba(201, 169, 89, 0.08) 0%, transparent 50%),
-                radial-gradient(ellipse at 80% 70%, rgba(184, 115, 51, 0.06) 0%, transparent 50%);
+            padding: 20px;
         }
 
         .container {
-            text-align: center;
-            max-width: 600px;
+            max-width: 900px;
             width: 100%;
         }
 
-        .logo {
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+
+        h1 {
             font-family: 'Cormorant Garamond', serif;
-            font-size: 3.5rem;
+            font-size: 3rem;
             font-weight: 500;
-            color: var(--text-light);
-            margin-bottom: 0.5rem;
-            letter-spacing: 0.02em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
         }
 
         .tagline {
-            font-size: 1rem;
-            color: var(--text-muted);
-            margin-bottom: 4rem;
+            color: #7d8a96;
+            font-size: 1.1rem;
             font-weight: 300;
-            letter-spacing: 0.1em;
-            text-transform: uppercase;
         }
 
-        .options {
+        .app-grid {
             display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 2rem;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 30px;
+            margin-bottom: 40px;
         }
 
-        @media (max-width: 500px) {
-            .options {
-                grid-template-columns: 1fr;
-                gap: 1.5rem;
-            }
-        }
-
-        .option-card {
-            background: var(--card-bg);
-            border: 1px solid rgba(245, 240, 232, 0.1);
-            border-radius: 16px;
-            padding: 2.5rem 2rem;
+        .app-card {
+            background: white;
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 8px 30px rgba(0,0,0,0.12);
             text-decoration: none;
             color: inherit;
-            transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
             position: relative;
             overflow: hidden;
         }
 
-        .option-card::before {
+        .app-card::before {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             right: 0;
-            height: 3px;
-            background: linear-gradient(90deg, var(--accent-gold), var(--accent-copper));
-            opacity: 0;
-            transition: opacity 0.3s ease;
+            height: 6px;
+            background: linear-gradient(90deg, #8b9d83, #a8b89f);
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
-        .option-card:hover {
+        .app-card:hover {
             transform: translateY(-8px);
-            border-color: rgba(201, 169, 89, 0.3);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+            box-shadow: 0 12px 40px rgba(139, 157, 131, 0.3);
         }
 
-        .option-card:hover::before {
-            opacity: 1;
+        .app-card:hover::before {
+            transform: scaleX(1);
         }
 
-        .option-icon {
-            font-size: 3rem;
-            margin-bottom: 1.5rem;
-            display: block;
+        .app-icon {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, #8b9d83, #a8b89f);
+            border-radius: 16px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 25px;
+            font-size: 2rem;
+            transition: transform 0.3s ease;
         }
 
-        .option-title {
+        .app-card:hover .app-icon {
+            transform: scale(1.1) rotate(5deg);
+        }
+
+        .app-title {
             font-family: 'Cormorant Garamond', serif;
             font-size: 1.8rem;
-            font-weight: 500;
-            margin-bottom: 0.75rem;
-            color: var(--text-light);
+            font-weight: 600;
+            color: #2c3e50;
+            margin-bottom: 12px;
         }
 
-        .option-desc {
-            font-size: 0.9rem;
-            color: var(--text-muted);
+        .app-description {
+            color: #6c757d;
             line-height: 1.6;
+            font-size: 0.95rem;
         }
 
-        .option-card.timeline .option-icon {
-            color: var(--accent-gold);
+        .app-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: #f0f4ed;
+            color: #6b7c64;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-top: 15px;
         }
 
-        .option-card.mobility .option-icon {
-            color: var(--accent-sage);
+        footer {
+            text-align: center;
+            margin-top: 50px;
+            color: #7d8a96;
+            font-size: 0.9rem;
         }
 
-        .footer {
-            margin-top: 4rem;
-            font-size: 0.8rem;
-            color: var(--text-muted);
+        .install-prompt {
+            background: white;
+            border-radius: 16px;
+            padding: 20px 30px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+            text-align: center;
+            margin-bottom: 30px;
+            display: none;
         }
 
-        /* Subtle floating animation */
-        @keyframes float {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
+        .install-prompt.show {
+            display: block;
+            animation: slideDown 0.5s ease;
         }
 
-        .option-card:hover .option-icon {
-            animation: float 2s ease-in-out infinite;
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .install-btn {
+            background: #8b9d83;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 10px;
+            font-family: 'Nunito Sans', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+        }
+
+        .install-btn:hover {
+            background: #7a8a73;
+            transform: translateY(-2px);
+        }
+
+        .close-prompt {
+            background: none;
+            border: none;
+            color: #6c757d;
+            cursor: pointer;
+            font-size: 1.5rem;
+            position: absolute;
+            top: 10px;
+            right: 15px;
+            padding: 5px 10px;
+        }
+
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 2.2rem;
+            }
+
+            .app-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .app-card {
+                padding: 30px 25px;
+            }
+        }
+
+        /* Loading animation for PWA */
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        body {
+            animation: fadeIn 0.5s ease;
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1 class="logo">Life Journey</h1>
-        <p class="tagline">Track your path forward</p>
-        
-        <div class="options">
-            <a href="timeline.html" class="option-card timeline">
-                <span class="option-icon">🌟</span>
-                <h2 class="option-title">Timeline</h2>
-                <p class="option-desc">Capture milestones and visualize your life's journey through time</p>
+        <header>
+            <h1>Life & Training Hub</h1>
+            <p class="tagline">Track your journey, optimize your performance</p>
+        </header>
+
+        <div id="installPrompt" class="install-prompt">
+            <button class="close-prompt" onclick="closeInstallPrompt()">×</button>
+            <p style="color: #2c3e50; font-weight: 600; margin-bottom: 5px;">Install App</p>
+            <p style="color: #6c757d; font-size: 0.9rem;">Add to your home screen for quick access</p>
+            <button class="install-btn" id="installButton">Install</button>
+        </div>
+
+        <div class="app-grid">
+            <a href="milestone-timeline.html" class="app-card">
+                <div class="app-icon">📍</div>
+                <div class="app-title">Milestone Timeline</div>
+                <p class="app-description">
+                    Track and visualize life's significant moments with a beautiful snaking timeline of your past and future milestones.
+                </p>
+                <span class="app-badge">Life Planning</span>
             </a>
-            
-            <a href="mobility.html" class="option-card mobility">
-                <span class="option-icon">🧘</span>
-                <h2 class="option-title">Mobility</h2>
-                <p class="option-desc">Track daily mobility routines and build consistent movement habits</p>
+
+            <a href="mobility-tracker.html" class="app-card">
+                <div class="app-icon">🧘</div>
+                <div class="app-title">Mobility Tracker</div>
+                <p class="app-description">
+                    Structured weekly mobility workouts with progress tracking and detailed exercise guidance for optimal movement.
+                </p>
+                <span class="app-badge">Wellness</span>
+            </a>
+
+            <a href="workout-finder.html" class="app-card">
+                <div class="app-icon">💪</div>
+                <div class="app-title">Workout Finder</div>
+                <p class="app-description">
+                    Quick access to your Block 3 training plan with RPE targets, protocols, and notes for every workout session.
+                </p>
+                <span class="app-badge">Training</span>
             </a>
         </div>
-        
-        <p class="footer">Your personal journey companion</p>
+
+        <footer>
+            <p>Personal productivity ecosystem • v1.0</p>
+        </footer>
     </div>
+
+    <script>
+        // PWA Install Prompt
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installButton = document.getElementById('installButton');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            installPrompt.classList.add('show');
+        });
+
+        installButton.addEventListener('click', async () => {
+            if (deferredPrompt) {
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                deferredPrompt = null;
+                installPrompt.classList.remove('show');
+            }
+        });
+
+        function closeInstallPrompt() {
+            installPrompt.classList.remove('show');
+        }
+
+        // Register service worker for PWA
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('service-worker.js')
+                    .then(registration => console.log('SW registered'))
+                    .catch(err => console.log('SW registration failed'));
+            });
+        }
+    </script>
 </body>
 </html>

@@ -1,127 +1,147 @@
-# Life Journey - Timeline & Mobility Tracker
+# Life & Training Hub
 
-A Progressive Web App combining milestone timeline tracking with daily mobility workout management.
+A personal productivity ecosystem featuring three integrated web applications for milestone tracking, mobility workouts, and training plan management.
 
-## New Files for Mobility Tracker Extension
+## Features
 
-### File Placement in Repository
+### 📍 Milestone Timeline
+- Beautiful snaking timeline visualization of life events
+- Track past and future milestones with detailed "what, when, why, results" fields
+- Organic flow design with years marked at turning points
+- Full data export/import capabilities
 
-Place these files in the **root directory** of your existing timeline repository:
+### 🧘 Mobility Tracker
+- Structured weekly mobility workout plans
+- Progress tracking with completion percentages
+- Detailed exercise guidance and protocols
+- Day-by-day workout organization
 
-```
-your-repo/
-├── index.html          ← NEW: Landing page (replaces or renames old index)
-├── timeline.html       ← RENAME your existing index.html to this
-├── mobility.html       ← NEW: Mobility tracker page
-├── mobility.css        ← NEW: Mobility tracker styles
-├── mobility-data.js    ← NEW: Workout data from your training plan
-├── mobility.js         ← NEW: Mobility tracker functionality
-├── manifest.json       ← UPDATE: New manifest with both features
-├── sw.js              ← KEEP: Existing service worker (update cache list)
-├── icon-192.png       ← KEEP: Existing icon
-├── icon-512.png       ← KEEP: Existing icon
-└── (your existing timeline files...)
-```
+### 💪 Workout Finder
+- Quick access to Block 3 training plan (12 weeks)
+- RPE targets and support protocols for each session
+- Three training phases: Speed Development, Peak Speed, HM Transition
+- Minimal clicks to reach any workout information
 
-### Step-by-Step Integration
+## Technology Stack
 
-1. **Rename your existing `index.html`** to `timeline.html`
+- **HTML5/CSS3/JavaScript** - Pure vanilla implementation
+- **Progressive Web App (PWA)** - Installable on any device
+- **localStorage** - Client-side data persistence
+- **Responsive Design** - Optimized for mobile and desktop
 
-2. **Copy new files** to the repository root:
-   - `index.html` (new landing page)
-   - `mobility.html`
-   - `mobility.css`
-   - `mobility-data.js`
-   - `mobility.js`
+## Getting Started
 
-3. **Replace `manifest.json`** with the updated version
+### Deployment to GitHub Pages
 
-4. **Update your service worker** (`sw.js`) to cache the new files:
-   ```javascript
-   const CACHE_FILES = [
-       '/',
-       '/index.html',
-       '/timeline.html',      // renamed from index.html
-       '/mobility.html',
-       '/mobility.css',
-       '/mobility-data.js',
-       '/mobility.js',
-       // ... your existing files
-   ];
+1. **Create a new GitHub repository**
+   ```bash
+   # Initialize your repository
+   git init
+   git add .
+   git commit -m "Initial commit"
    ```
 
-5. **Update any internal links** in your timeline files:
-   - Change any `href="index.html"` to `href="timeline.html"` if needed
-   - Add a back link to the landing page if desired
+2. **Push to GitHub**
+   ```bash
+   git remote add origin https://github.com/yourusername/your-repo-name.git
+   git branch -M main
+   git push -u origin main
+   ```
 
-### Features
+3. **Enable GitHub Pages**
+   - Go to your repository Settings
+   - Navigate to "Pages" in the left sidebar
+   - Under "Source", select "main" branch
+   - Click "Save"
+   - Your site will be live at: `https://yourusername.github.io/your-repo-name/`
 
-#### Landing Page (`index.html`)
-- Clean selection between Timeline and Mobility tracker
-- Consistent visual style with existing app
+### Local Development
 
-#### Mobility Tracker (`mobility.html`)
-- **Day Selection**: Quick access to any day's workout
-- **Routine Selection**: Pre-workout, Post-workout, or Full sessions
-- **Exercise Tracking**: Tap to mark exercises complete
-- **Progress Bar**: Visual completion tracking
-- **History**: Last 10 sessions displayed
-- **Export**: CSV or JSON export for external tracking
+Simply open `index.html` in a web browser. For best results, use a local server:
 
-### Export Format
+```bash
+# Python 3
+python -m http.server 8000
 
-The CSV export includes these columns for compatibility with other tracking services:
+# Node.js (with npx)
+npx serve
 
-| Column | Description |
-|--------|-------------|
-| Date | Formatted date (e.g., "Mon, Jan 27, 2025") |
-| Block | Training block number |
-| Week | Week of year |
-| Day | Day name |
-| Routine | Routine name |
-| Exercises Completed | Semicolon-separated list |
-| Exercises Not Completed | Semicolon-separated list |
-
-### Data Storage
-
-- Workout history is stored in `localStorage` under key `mobilityHistory`
-- Data persists across sessions on the same device
-- Use export feature for backup or cross-device transfer
-
-### Customization
-
-To modify workouts, edit `mobility-data.js`:
-
-```javascript
-const MOBILITY_DATA = {
-    monday: {
-        name: "Monday - Strength",
-        routines: {
-            "pre-workout": {
-                name: "Pre-Workout Support",
-                exercises: [
-                    { 
-                        order: 1, 
-                        name: "Exercise Name", 
-                        sets: "2x10", 
-                        load: "10kg", 
-                        purpose: "Why", 
-                        cue: "How to perform" 
-                    },
-                    // ... more exercises
-                ]
-            }
-        }
-    },
-    // ... other days
-};
+# Then open http://localhost:8000
 ```
 
-### PWA Installation
+## Installation as PWA
 
-The app works as a PWA on mobile devices:
+### On iPhone/iPad:
+1. Open the site in Safari
+2. Tap the Share button
+3. Scroll down and tap "Add to Home Screen"
+4. Tap "Add"
 
-1. Open in Safari (iOS) or Chrome (Android)
-2. Tap "Share" → "Add to Home Screen"
-3. The app icon will appear on your home screen
-4. App works offline after first load
+### On Android:
+1. Open the site in Chrome
+2. Tap the three-dot menu
+3. Tap "Add to Home Screen"
+4. Tap "Add"
+
+### On Desktop (Chrome/Edge):
+1. Look for the install icon in the address bar
+2. Click "Install"
+
+## File Structure
+
+```
+.
+├── index.html              # Main landing page
+├── milestone-timeline.html # Timeline application
+├── mobility-tracker.html   # Mobility workout tracker
+├── workout-finder.html     # Training plan finder
+├── manifest.json          # PWA manifest
+├── service-worker.js      # PWA service worker for offline support
+└── README.md             # This file
+```
+
+## Data Storage
+
+All applications use browser localStorage for data persistence:
+- **Milestones**: Stored as JSON array in `milestones` key
+- **Mobility Progress**: Stored per workout in `workout_[day]_progress` keys
+- **Training Data**: Embedded in workout-finder.html (Block 3 data)
+
+## Customization
+
+### Colors
+The apps use a warm color palette with sage green accents:
+- Primary: `#8b9d83` (sage green)
+- Background: `#f5f3f0` to `#e8e4df` gradient
+- Text: `#2c3e50` (dark blue-gray)
+
+### Fonts
+- **Headings**: Cormorant Garamond (serif)
+- **Body**: Nunito Sans (sans-serif)
+
+### Training Data
+To update the workout finder with different training blocks, edit the `trainingData` object in `workout-finder.html`.
+
+## Browser Support
+
+- Chrome/Edge (latest)
+- Firefox (latest)
+- Safari 14+
+- iOS Safari 14+
+- Chrome for Android
+
+## Privacy
+
+All data is stored locally in your browser. No data is sent to external servers. Data export/import features allow you to back up your information.
+
+## License
+
+Personal use project. Feel free to adapt for your own needs.
+
+## Version
+
+Current version: 1.0.0
+
+---
+
+Built with care for personal productivity and wellness tracking.
